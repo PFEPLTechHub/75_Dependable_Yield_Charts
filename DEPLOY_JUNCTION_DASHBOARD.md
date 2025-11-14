@@ -3,7 +3,7 @@
 
 **Application:** 75% Dependable Yield Dashboard  
 **Type:** React Static Site (No Backend)  
-**Suggested Subdomain:** dashboard.pfepltech.com  
+**Your Subdomain:** 75_dependable_yield_charts.pfepltech.com  
 **VPS IP:** 69.62.78.157  
 
 ---
@@ -62,44 +62,75 @@ chmod 755 /var/www/junction-dashboard
 
 ---
 
-### **STEP 4: Upload Your Built Files**
+### **STEP 4: Push to GitHub**
 
-**Open a NEW PowerShell window** (keep SSH open):
+**On your Windows PC:**
 
 ```powershell
-# Navigate to your project
 cd "C:\Users\Rutaab\Desktop\Sakina 75 percent script\junction-dashboard"
 
-# Upload the entire dist folder
-scp -r dist/* srv1006127:/var/www/junction-dashboard/
+# Add all files to git
+git add .
 
-# Wait for upload to complete
+# Commit changes
+git commit -m "Junction dashboard ready for deployment"
+
+# Push to GitHub
+git push origin main
 ```
 
-**Alternative: Using WinSCP**
-1. Connect to VPS (srv1006127 or 69.62.78.157)
-2. Navigate to `/var/www/junction-dashboard/`
-3. Upload everything from your local `dist` folder
+**Note:** If this is a new repo, first create it on GitHub and set the remote:
+```powershell
+git remote add origin YOUR_GITHUB_REPO_URL
+git push -u origin main
+```
 
 ---
 
-### **STEP 5: Verify Files on VPS**
+### **STEP 5: Clone from GitHub on VPS**
 
-Back in your SSH session:
+**Back in your SSH session:**
 
 ```bash
-# Check if files uploaded correctly
-ls -la /var/www/junction-dashboard/
+# Navigate to web directory
+cd /var/www/junction-dashboard
 
-# You should see:
-# - index.html
-# - assets/ folder
-# - data.json (or in public/)
+# Clone your GitHub repository
+git clone YOUR_GITHUB_REPO_URL .
+
+# Example:
+# git clone https://github.com/yourusername/junction-dashboard.git .
+
+# If repo is private, you'll need to enter GitHub credentials
 ```
 
 ---
 
-### **STEP 6: Configure Nginx for Dashboard**
+### **STEP 6: Build on VPS**
+
+```bash
+# Install Node.js if not already installed
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+
+# Install dependencies
+npm install
+
+# Build for production
+npm run build
+
+# Move built files to root
+mv dist/* .
+rm -rf dist
+
+# Verify files
+ls -la
+# You should see: index.html, assets/, etc.
+```
+
+---
+
+### **STEP 7: Configure Nginx for Dashboard**
 
 Create Nginx configuration:
 
@@ -112,7 +143,7 @@ nano /etc/nginx/sites-available/junction-dashboard
 ```nginx
 server {
     listen 80;
-    server_name dashboard.pfepltech.com;
+    server_name 75_dependable_yield_charts.pfepltech.com;
 
     # Dashboard files location
     root /var/www/junction-dashboard;
@@ -145,7 +176,7 @@ server {
 
 ---
 
-### **STEP 7: Enable the Site**
+### **STEP 8: Enable the Site**
 
 ```bash
 # Create symbolic link to enable the site
@@ -163,44 +194,43 @@ systemctl status nginx
 
 ---
 
-### **STEP 8: Configure DNS for Subdomain**
+### **STEP 9: Verify DNS Configuration**
 
-Go to your domain registrar (where you manage pfepltech.com):
+✅ Your DNS is already configured:
 
-**Add this DNS record:**
 ```
 Type: A
-Name: dashboard
+Name: 75_dependable_yield_charts
 Value: 69.62.78.157
-TTL: 3600 (or Auto)
+TTL: 14400
 ```
 
-This creates: `dashboard.pfepltech.com` → `69.62.78.157`
+This creates: `75_dependable_yield_charts.pfepltech.com` → `69.62.78.157`
 
-⏰ **Wait 5-30 minutes** for DNS propagation.
+⏰ **Wait 5-30 minutes** for DNS propagation (if just added).
 
 ---
 
-### **STEP 9: Test Your Dashboard (HTTP)**
+### **STEP 10: Test Your Dashboard (HTTP)**
 
 After DNS propagates, test in browser:
 
 ```
-http://dashboard.pfepltech.com
+http://75_dependable_yield_charts.pfepltech.com
 ```
 
 You should see your junction dashboard! 🎉
 
 ---
 
-### **STEP 10: Install SSL Certificate (HTTPS)**
+### **STEP 11: Install SSL Certificate (HTTPS)**
 
 ```bash
 # Install Certbot (if not already installed)
 apt install -y certbot python3-certbot-nginx
 
 # Get SSL certificate
-certbot --nginx -d dashboard.pfepltech.com
+certbot --nginx -d 75_dependable_yield_charts.pfepltech.com
 
 # Follow prompts:
 # - Enter your email
@@ -210,12 +240,12 @@ certbot --nginx -d dashboard.pfepltech.com
 
 ---
 
-### **STEP 11: Verify HTTPS Works**
+### **STEP 12: Verify HTTPS Works**
 
 Open browser and visit:
 
 ```
-https://dashboard.pfepltech.com
+https://75_dependable_yield_charts.pfepltech.com
 ```
 
 ✅ You should see:
@@ -227,7 +257,7 @@ https://dashboard.pfepltech.com
 
 ## 🧪 TESTING CHECKLIST
 
-- [ ] Dashboard loads: `https://dashboard.pfepltech.com`
+- [ ] Dashboard loads: `https://75_dependable_yield_charts.pfepltech.com`
 - [ ] HTTP redirects to HTTPS
 - [ ] Both charts display correctly
 - [ ] Junction selector dropdown works
@@ -246,17 +276,29 @@ When you make changes and want to update:
 ```powershell
 cd "C:\Users\Rutaab\Desktop\Sakina 75 percent script\junction-dashboard"
 
-# Build new version
-npm run build
-
-# Upload to VPS
-scp -r dist/* srv1006127:/var/www/junction-dashboard/
+# Commit and push changes
+git add .
+git commit -m "Update dashboard"
+git push origin main
 ```
 
 ### **On VPS:**
 
 ```bash
-# Clear Nginx cache (optional)
+# SSH to VPS
+ssh srv1006127
+
+# Pull latest changes
+cd /var/www/junction-dashboard
+git pull origin main
+
+# Rebuild
+npm install
+npm run build
+mv dist/* .
+rm -rf dist
+
+# Restart Nginx
 systemctl restart nginx
 ```
 
@@ -313,7 +355,7 @@ certbot renew
 | Item | Value |
 |------|-------|
 | **VPS IP** | 69.62.78.157 |
-| **Domain** | dashboard.pfepltech.com |
+| **Domain** | 75_dependable_yield_charts.pfepltech.com |
 | **Location** | /var/www/junction-dashboard |
 | **Web Server** | Nginx |
 | **SSL** | Let's Encrypt (Certbot) |
@@ -367,7 +409,7 @@ ls -la /var/www/junction-dashboard/
 ## 🎉 SUCCESS!
 
 Once completed, your dashboard will be live at:
-**https://dashboard.pfepltech.com**
+**https://75_dependable_yield_charts.pfepltech.com**
 
 Anyone can access it with just the URL - no login needed!
 

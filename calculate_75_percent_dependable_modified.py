@@ -206,13 +206,13 @@ def seventy_five_dependability(input_excel, output_excel=None, num_years=None, n
 
 # === Main execution ===
 if __name__ == "__main__":
-    INPUT_PATH = r"ALL MERGED 22 Points_09112025.xlsx"
+    INPUT_PATH = r"combined_transposed_junction12.xlsx"
     
     # Calculate 75% dependable yield using ALL years and ALL dates
     seventy_five_dependability(
         input_excel=INPUT_PATH,
-        output_excel="75_Percent_Dependable_FULL.xlsx",
+        output_excel="75_Percent_Dependable_combined_junction12.xlsx",
         num_years=None,  # Use ALL years available
-        num_days=None    # Process ALL dates (153 days)
+        num_days=None    # Process ALL dates
     )
 
